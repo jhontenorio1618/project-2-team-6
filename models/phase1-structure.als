@@ -37,6 +37,32 @@ sig CargoVehicle extends Vehicle {
     #cargo <= maxCapacity
 }
 
+//move people
+pred movePerson[p: Person, from: Location, to: Location, v: Vehicle] {
+    p.location = from
+    p.location' = to
+    #v.passengers < v.maxCapacity
+    v.passengers' = v.passengers + p
+    
+}
+
+//move location of materials
+pred moveMaterial[m: Material, from: Location, to: Location, v: Vehicle] {
+    m.location = from
+    m.location' = to
+    #v.cargo + 1 <= v.maxCapacity  
+    v.cargo' = v.cargo + m  
+}
+
+//check if job has people + materials ot finish, removes workplace if finished
+pred completeJob[w: Workplace] {
+    # { p: Person | p.location = w } >= w.requiredPeople and
+    w.requiredMaterials in { m: Material | m.location = w }
+
+    no w
+}
+
+
 // Ensure workplaces have the necessary resources
 fact WorkRequirements {
     all w: Workplace | 
@@ -55,4 +81,4 @@ fact ValidMaterialLocation {
 }
 
 
-run {} for 10
+run {} for 15
